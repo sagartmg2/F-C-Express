@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        ul {
+            list-style-type: none;
+            display: flex;
+            gap: .5rem;
+            flex-wrap: wrap;
+        }
+
+        #alphabets {
+            width: 500px;
+        }
+
+        #alphabets li {
+            background-color: teal;
+            border-radius: 50%;
+            color: white;
+            padding: 1rem;
+            user-select: none;
+        }
+
+        li.disabled {
+            opacity: .4;
+        }
+    </style>
+</head>
+
+<body>
+
+    <ul id="input">
+        <li>_</li>
+        <li>_</li>
+    </ul>
+
+    <ul id="alphabets">
+    </ul>
+
+
+    <script src="./words.js"> </script>
+    <script>
+
+        let life_remaing = 6
+        let used_words = []
+
+        let random_word = words[Math.floor(Math.random() * words.length)]
+        console.log(random_word)
+
+        /* "accept" */
+        let str = "";  // "<li>_</li><li>_</li>"
+        let random_words_arr = random_word.split("");
+        random_words_arr.forEach(word => {
+            str += "<li>_<li>"
+        })
+        document.getElementById("input").innerHTML = str
+
+
+        let alphabets = "A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z"
+
+        str = ""
+        alphabets.split(",").forEach(alphabet => {
+            str += `<li onclick="checkWord('${alphabet}')" >${alphabet}</li>`
+        })
+
+        document.getElementById("alphabets").innerHTML = str
+
+        function checkWord(letter) { // A
+            // ["a","c","c"]
+
+            letter = letter.trim().toLowerCase()
+            used_words.push(letter)
+
+            let matched = random_words_arr.includes(letter)
+
+            if (matched) {
+                console.log("matched");
+
+                str = ""
+                let count = 0;
+                random_words_arr.forEach(word => {
+                    if (used_words.includes(word)) {
+                        count++
+                        str += `<li>${word}</li>`
+                    } else {
+                        str += `<li>_</li>`
+                    }
+                })
+
+                document.getElementById("input").innerHTML = str
+                if (random_word.length == count) {
+                    console.log("congrats...");
+                }
+
+            } else {
+                --life_remaing
+                if (life_remaing == 0) {
+                    console.log("game over ");
+                    reset()
+                } else {
+                    console.log("didnot");
+                }
+
+            }
+
+            str = ""
+            alphabets.split(",").forEach(alphabet => {
+                alphabet = alphabet.trim().toLowerCase()
+                if (used_words.includes(alphabet)) {
+                    str += `<li class="disabled">${alphabet}</li>`
+                } else {
+                    str += `<li onclick="checkWord('${alphabet}')" >${alphabet}</li>`
+                }
+            })
+            document.getElementById("alphabets").innerHTML = str
+
+        }
+
+
+    </script>
+
+</body>
+
+</html>
