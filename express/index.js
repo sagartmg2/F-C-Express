@@ -1,73 +1,83 @@
-const express = require('express')
+const express = require("express")
 const app = express()
-app.use(express.json())  // global middlware -> runs for every route
+const fs = require("fs")
+const path = require("path")
 
-/*
- MIDDLEWARE  
-    - a funciton which has access to request and response AND also next function
-
-        next function points out to the upcomming valid middleware 
-
-    - global middelware
+/* middleware  - a function wich has access to request and response and also next valid middleware
+    - global middleware
     - route level middleware
+*/
+
+/* status
+    200 201 202 203 204
+    3 
+    4
+        400
+        401  unauthenated.
+        403  forbidden
+        404
+    5
+        500
 */
 
 
 
 function checkAuthentication(req, res, next) {
-    let logged_in = false
+    
+    let is_logged_in = true;
+    if (is_logged_in) {
+        console.log("check authentication");
+        next()
+        return;
+    }
 
-    if (logged_in) {
+    res.status(401).send({
+        msg: "Unauthencated."
+    })
+
+}
+
+function checkIsBuyer(req, res, next) {
+    console.log("check is buyer");
+    let is_buyer = false;
+    if (is_buyer) {
         next()
     } else {
-        res.status(401).send({ msg: "not logged in" })
+        res.status(403).send({
+            msg: "Access Denied . only for buyers."
+        })
     }
+
 }
 
 // app.use(checkAuthentication)
+// app.use(checkIsBuyer)
 
 
-/* STATUS CODES
-    2
-    3
-    4
-        400 -
-        401 - NOT logge din 
-        403
-        404
-    5
-    
-    */
-/* CRUD : create read update detelte */
-/* REQUEST methods:  GET POST PUT/PATCH DELETE  */
+app.get("/api/orders", checkAuthentication, checkIsBuyer, (req, res) => {
+    res.send("send orders");
+})
 
-
-app.get("/api/dashboard", checkAuthentication, (req, res) => {
-    console.log("inside dahsbord..");
+app.get("/api/products", (req, res) => {
+    console.log("send products");
     res.send({
-        user: 100,
-        sales: 123123
+        data: [
+            {
+                "name": "compouter", price: 10000
+            }
+        ]
     })
 })
 
-app.get("/", (req, res) => {
-    res.send("Home page data")
+
+app.use((req, res) => {
+    // res.sendFile(path.join(path.resolve(),"index-1.js"))
+    // return;
+    res.status(404).send({
+        msg: "Resource Not Found"
+    })
 })
 
-app.get("/api/todos", (req, res) => {
-    res.send([
-        { title: "html", status: false },
-        { title: "css", status: false },
-        { title: "js", status: true }
-    ])
-})
-
-app.post("/api/todos", (req, res) => {
-    // console.log("save new todos");
-    /* link to DB */
-    console.log(req.body);
-    res.send({ _id: "#$@#$", title: "ttile" })
-})
 
 app.listen(8000, () => {
     console.log("server started");
