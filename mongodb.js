@@ -126,9 +126,51 @@ db.watches.find({
         { Complication: RegExp("gmt", "i") },
         { Complication: RegExp("stop seconds", "i") },
     ],
-},{price:1})
-.sort({price:1})
+}, { price: 1 })
+    .sort({ price: 1 })
 
 db.watches.find({ price: "15000" })
 db.watches.find({ Complication: " GMT" })
 
+
+
+db.watches.find({ Size: { $gt: 35 } }, { Size: 1 })
+db.watches.find({
+    $and: [
+        { Size: { $gte: 35 } },
+        { Size: { $lte: 40 } },
+    ]
+},{Size:1})
+
+
+db.watches.find({
+    $and: [
+        { price: { $gte: "30000" } },
+        { price: { $lte: "35000" } },
+        { Size: { $eq: 40 } },
+    ]
+},{Size:1,price:1})
+
+db.watches.find({
+    $or: [
+        { price: { $gte: "50000" } },
+        { Complication: { $eq: RegExp("seconds","i") } },
+    ]
+},{Complication:1,price:1})
+
+db.watches.find({
+    $or: [
+        { price: { $gte: "100000" } },
+        { Complication: { $eq: RegExp("seconds","i") } },
+        { Complication: { $eq: RegExp("GMT","i") } },
+    ]
+},{Complication:1,price:1})
+
+db.watches.find({
+    Complication:{$in:[ RegExp("GMT"), RegExp("stop seconds","i") ]}
+},{Complication:1})
+
+
+
+db.watches.find()
+db.watches.find().skip(2).limit(20).sort({price:-1,Reference:1})
