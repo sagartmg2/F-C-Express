@@ -4,9 +4,19 @@ const Schema = mongoose.Schema;
 // const ObjectId = Schema.ObjectId;
 
 const TodoSchema = new Schema({
-  title: String,
-  status: Boolean,
+  title: {
+    type: String,
+    required: true,
+  },
+  status: {
+    required: true,
+    type: Boolean,
+    // default: false,
+  },
+},
+{
+  timestamps:true, 
 });
 
-module.exports = mongoose.model("Todo",TodoSchema)
+module.exports = mongoose.model("Todo", TodoSchema)
 
