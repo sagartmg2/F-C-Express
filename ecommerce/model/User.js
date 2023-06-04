@@ -6,7 +6,7 @@ const ObjectId = Schema.ObjectId;
 const UserSchema = new Schema({
     name: {
         type: String,
-        required: true,
+        required: [true, "required field"]
     },
     email: {
         type: String,
@@ -34,7 +34,6 @@ const UserSchema = new Schema({
         type: String,
         enum: ["buyer", "seller"],
         set: function (value) {
-            console.log("set-value", value)
             return value.toLowerCase();
         }
     }
