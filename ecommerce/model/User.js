@@ -13,9 +13,9 @@ const UserSchema = new Schema({
         required: true,
         validate: {
             validator: async function (req_value) {
-                let count = await mongoose.models.User.countDocuments({email: req_value}) 
-                
-                if(count){
+                let count = await mongoose.models.User.countDocuments({ email: req_value })
+
+                if (count) {
                     return false
                 }
                 return true;
@@ -28,6 +28,7 @@ const UserSchema = new Schema({
     password: {
         type: String,
         required: true,
+        select: false
     },
     role: {
         required: true,
