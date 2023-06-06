@@ -3,12 +3,59 @@ const bcrypt = require("bcrypt")
 const Joi = require('joi')
 
 const User = require("./model/User");
+const Product = require("./model/Product");
+const { SELLER } = require("./constants/role");
+const { checkAuthentication } = require("./middleware/auth");
 
 const app = express();
 require("./config/database")
 app.use(express.json()) // global middleware
 
 /* falsy values - alse, null, undefined , 0 , "", NaN    */
+
+app.get("/api/products", async (req, res, next) => {
+
+    try {
+        let products = await Product.find()
+        res.send(products)
+    } catch (err) {
+        next(err)
+    }
+})
+
+
+
+const productCreateSchema = Joi.object({
+    name: Joi.string().required(),
+    price: Joi.required(),
+})
+
+app.post("/api/products", checkAuthentication, async (req, res, next) => {
+
+    try {
+
+        let { error } = productCreateSchema.validate(req.body,
+            {
+                abortEarly: false,
+                allowUnknown: true,
+            })
+
+        console.log("errors", error?.details)
+
+        if (error?.details) {
+            res.status(400).send({
+                errors: error?.details
+            })
+            return;
+        }
+
+        let product = await Product.create({ ...req.body, created_by: req.user_id })
+        res.send(product)
+    } catch (err) {
+        next(err)
+    }
+})
+
 
 const schema = Joi.object({
     name: Joi.string().required(),
@@ -36,11 +83,10 @@ app.post("/api/signup", async (req, res, next) => {
             return;
         }
 
+        /* 10 is salt round - complexity  */
         let hashed = await bcrypt.hash(req.body.password, 10);
 
-        console.log({ hashed })
-
-        let user = await UUser.create({ ...req.body, password: hashed })
+        let user = await User.create({ ...req.body, password: hashed })
 
         res.send(user)
 
@@ -80,7 +126,7 @@ app.post("/api/login", async (req, res, next) => {
         /* 3. check password */
 
         let user = await User.findOne({ email: req.body.email }).select("+password")
-        
+
 
         if (user) {
 

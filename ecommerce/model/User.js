@@ -1,4 +1,5 @@
 const { default: mongoose } = require("mongoose");
+const { BUYER, SELLER } = require("../constants/role");
 
 const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
@@ -33,11 +34,11 @@ const UserSchema = new Schema({
     role: {
         required: true,
         type: String,
-        enum: ["buyer", "seller"],
+        enum: [BUYER, SELLER],
         set: function (value) {
             return value.toLowerCase();
         }
-    }
+    },
 }, {
     timestamps: true,
 });
