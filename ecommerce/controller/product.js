@@ -42,7 +42,15 @@ const create = async (req, res, next) => {
     }
 }
 
+const fetchSingleProduct = async (req, res) => {
+
+    let product = await Product.findById(req.params.id)
+    res.send(product)
+    
+}
+
 module.exports = {
     get,
+    fetchSingleProduct,
     create
 }
