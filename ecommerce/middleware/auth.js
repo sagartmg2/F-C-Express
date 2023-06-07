@@ -5,7 +5,8 @@ function checkAuthentication(req, res, next) {
     /* 
         TODO: check logged status from req.
      */
-    let loggedIn = false
+
+    let loggedIn = true
     if (loggedIn) {
 
         req.role = "seller"
