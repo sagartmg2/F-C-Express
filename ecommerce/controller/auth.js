@@ -1,5 +1,6 @@
 const Joi = require("joi")
 const User = require("../model/User")
+const jwt = require("jsonwebtoken")
 
 const bcrypt = require("bcrypt")
 
@@ -36,6 +37,8 @@ const signup = async (req, res, next) => {
 
         let user = await User.create({ ...req.body, password: hashed })
 
+        user = user.toObject()
+        delete user.password
         res.send(user)
 
     } catch (err) {
@@ -79,8 +82,16 @@ const login = async (req, res, next) => {
 
             let matched = await bcrypt.compare(req.body.password, user.password);
             if (matched) {
+
+                let userObj = user.toObject()
+                delete userObj.password;
+
+                let token = jwt.sign(userObj, process.env.JWT_SECRET);
+
+
                 res.send({
-                    msg: "login successful"
+                    msg: "login successful",
+                    token
                 })
                 return;
             }

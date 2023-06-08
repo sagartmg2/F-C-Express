@@ -35,7 +35,7 @@ const create = async (req, res, next) => {
             return;
         }
 
-        let product = await Product.create({ ...req.body, created_by: req.user_id })
+        let product = await Product.create({ ...req.body, created_by: req.user._id })
         res.send(product)
     } catch (err) {
         next(err)

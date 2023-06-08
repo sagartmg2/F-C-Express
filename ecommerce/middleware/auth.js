@@ -1,4 +1,5 @@
-const { SELLER } = require("../constants/role")
+const { SELLER, BUYER } = require("../constants/role")
+const jwt = require("jsonwebtoken")
 
 function checkAuthentication(req, res, next) {
 
@@ -6,19 +7,21 @@ function checkAuthentication(req, res, next) {
         TODO: check logged status from req.
      */
 
-    let loggedIn = true
-    if (loggedIn) {
 
-        req.role = "seller"
+    let token = req.headers?.authorization?.split(" ")[1]
 
-        if (req.role === SELLER) {
-            req.user_id = "6479c91458b921521f148f5d"
-            next()
-        } else {
-            res.status(403).send({
-                msg: "forbidden"
-            })
-        }
+    let user = null;
+
+    try {
+        user = jwt.verify(token, process.env.JWT_SECRET);
+    }
+    catch (err) {
+
+    }
+
+    if (user) {
+        req.user = user;
+        next()
 
     } else {
         res.status(401).send({
@@ -27,8 +30,30 @@ function checkAuthentication(req, res, next) {
     }
 }
 
+const isBuyer = (req, res, next) => {
+    if (req.user.role === BUYER) {
+        next()
+      } else {
+          res.status(403).send({
+              msg: "forbidden"
+          })
+      } 
+}
+
+const isSeller = (req, res, next) => {
+    if (req.user.role === SELLER) {
+      next()
+    } else {
+        res.status(403).send({
+            msg: "forbidden"
+        })
+    }        
+}
+
 module.exports = {
-    checkAuthentication
+    checkAuthentication,
+    isBuyer,
+    isSeller
 }
 
 
