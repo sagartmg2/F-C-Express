@@ -11,6 +11,8 @@ const handleServerError = (err, req, res, next) => {
     let message = "Server Error"
     let errors = []
 
+    console.log(err.name)
+
     if (err.name == "ValidationError") {
         statuscode = 400;
         message = "Bad Request";
@@ -21,10 +23,13 @@ const handleServerError = (err, req, res, next) => {
             }
         })
 
+    }else if(err.name == "CastError"){
+        statuscode = 404;
+        message  = "Resrouce Not found"
     }
 
     res.status(statuscode).send({
-        msg: message + " " + err.message,
+        msg: message + " " +  err.message,
         errors
     })
 

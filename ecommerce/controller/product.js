@@ -1,5 +1,6 @@
 const Product = require("../model/Product")
 const Joi = require("joi")
+const path = require("path")
 
 const get = async (req, res, next) => {
 
@@ -18,6 +19,10 @@ const productCreateSchema = Joi.object({
 
 const create = async (req, res, next) => {
 
+    // console.log(__dirname)
+    // console.log(path.join(path.resolve(), "uploads"))
+
+
     try {
 
         let { error } = productCreateSchema.validate(req.body,
@@ -35,18 +40,41 @@ const create = async (req, res, next) => {
             return;
         }
 
-        let product = await Product.create({ ...req.body, created_by: req.user._id })
+
+        let images = [];
+
+        req.files.images.forEach(img => {
+            let img_name =  Date.now() + '-' + Math.round(Math.random() * 1E9) + img.name;
+            let img_res = img.mv(path.join(__dirname, '../uploads/' +  img_name))
+            // console.log(img_res)
+            images.push(img_name)
+
+        })
+
+        let product = await Product.create({ ...req.body, created_by: req.user._id, images })
         res.send(product)
     } catch (err) {
         next(err)
     }
 }
 
-const fetchSingleProduct = async (req, res) => {
+const fetchSingleProduct = async (req, res, next) => {
 
-    let product = await Product.findById(req.params.id)
-    res.send(product)
-    
+    try {
+        let product = await Product.findById(req.params.id)
+        console.log(product)
+        if (product) {
+            res.send(product)
+        } else {
+            res.status(404).send({
+                msg: "Resource not found"
+            })
+        }
+    }
+    catch (err) {
+        next(err)
+    }
+
 }
 
 module.exports = {
