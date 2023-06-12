@@ -42,10 +42,17 @@ const create = async (req, res, next) => {
 
 
         let images = [];
+        console.log(req.body)
+        console.log(req.files)
 
-        req.files.images.forEach(img => {
-            let img_name =  Date.now() + '-' + Math.round(Math.random() * 1E9) + img.name;
-            let img_res = img.mv(path.join(__dirname, '../uploads/' +  img_name))
+
+        /* req.files.images[]   req.files.images   */
+        // return;
+
+        // req.files["images[]"].forEach(img => {
+        req.files.images?.forEach(img => {
+            let img_name = Date.now() + '-' + Math.round(Math.random() * 1E9) + img.name;
+            let img_res = img.mv(path.join(__dirname, '../uploads/' + img_name))
             // console.log(img_res)
             images.push(img_name)
 
@@ -77,8 +84,23 @@ const fetchSingleProduct = async (req, res, next) => {
 
 }
 
+
+const updateProduct = () => {
+
+}
+const updateReview = (req, res, next) => {
+    /* logics to update reqview.  */
+
+    /* Product.findByIdAndUpdate() */
+    res.send("updated..")
+}
+
+
+
 module.exports = {
     get,
     fetchSingleProduct,
-    create
+    create,
+    updateReview,
+    updateProduct
 }

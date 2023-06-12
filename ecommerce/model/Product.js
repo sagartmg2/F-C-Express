@@ -15,8 +15,8 @@ const ProductSchema = new Schema({
         required: true,
         min: 0
     },
-    images:{
-        type:[String],
+    images: {
+        type: [String],
     },
     description: {
         type: String
@@ -26,7 +26,26 @@ const ProductSchema = new Schema({
         required: true,
         type: ObjectId,
         ref: "User"
-    }
+    },
+    reviews: [
+        {
+            rating: {
+                type: Number,
+                min: 1,
+                max: 5,
+                required: true,
+            },
+            created_by: {
+                type: ObjectId,
+                ref: "User",
+                required: true,
+            },
+            comment: {
+                type: String,
+            }
+        }
+    ]
+
 });
 
 module.exports = mongoose.model('Product', ProductSchema);

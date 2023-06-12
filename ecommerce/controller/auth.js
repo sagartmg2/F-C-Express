@@ -102,8 +102,6 @@ const login = async (req, res, next) => {
             msg: "Invalid Credentaions"
         })
 
-
-
     }
     catch (err) {
         next(err)
