@@ -42,6 +42,7 @@ const ProductSchema = new Schema({
             },
             comment: {
                 type: String,
+                maxLength: 255
             }
         }
     ]

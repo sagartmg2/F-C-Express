@@ -5,7 +5,7 @@ const path = require("path")
 const get = async (req, res, next) => {
 
     try {
-        let products = await Product.find()
+        let products = await Product.find({},{reviews:0})
         res.send(products)
     } catch (err) {
         next(err)
@@ -85,14 +85,79 @@ const fetchSingleProduct = async (req, res, next) => {
 }
 
 
-const updateProduct = () => {
+const updateProduct = async (req, res, next) => {
+
+    try {
+        let product = await Product.findByIdAndUpdate(req.params.id, {
+            name: req.body.name,
+            price: req.body.price
+        }, { new: true, runValidators: true })
+        res.send(product)
+    } catch (err) {
+        next(err)
+    }
+
 
 }
-const updateReview = (req, res, next) => {
-    /* logics to update reqview.  */
+const updateReview = async (req, res, next) => {
 
-    /* Product.findByIdAndUpdate() */
-    res.send("updated..")
+    /* 1. find if user has already rated.  */
+    /* 2. if yes.. update old */
+    /* 2. else create new  */
+
+
+
+
+    try {
+
+        let exists = await Product.findOne({ _id: req.params.id, "reviews.created_by": req.user._id })
+
+        if (exists) {
+            /* update old */
+            let product = await Product.findOneAndUpdate({ _id: req.params.id, "reviews.created_by": req.user._id }, {
+                "reviews.$.rating": req.body.rating,
+                "reviews.$.comment": req.body.comment,
+            }, { new: true, runValidators: true })
+
+
+            /*  
+            let product = product.find(prouct_id)
+            let old_revies = product.reviews
+
+            old_reviews.map(review =>{
+                if(review.createdby == req.user._id){
+                    return {
+                        comment:req.body.comemnt,
+                        rating:req.body.rating
+                    }
+                }
+                return review
+            })
+
+            */
+
+
+            res.send(product)
+
+        } else {
+            let product = await Product.findByIdAndUpdate(req.params.id, {
+                $push: {
+                    "reviews": {
+                        rating: req.body.rating,
+                        comment: req.body.comment,
+                        created_by: req.user._id
+                    }
+                }
+            }, { new: true, runValidators: true })
+            res.send(product)
+
+        }
+
+
+
+    } catch (err) {
+        next(err)
+    }
 }
 
 
