@@ -39,3 +39,11 @@ let converted = Object.entries(errors).map(error =>{
 })
 
 console.log(converted)
+
+
+
+/*  */
+
+db.products.updateMany({},{
+    $set:{stock:10}
+})

@@ -22,6 +22,11 @@ const ProductSchema = new Schema({
         type: String
     },
     categories: [String],
+    stock: {
+        type: Number,
+        min: 0,
+        default: 0
+    },
     created_by: {
         required: true,
         type: ObjectId,
