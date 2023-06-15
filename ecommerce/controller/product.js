@@ -5,7 +5,83 @@ const path = require("path")
 const get = async (req, res, next) => {
 
     try {
-        let products = await Product.find({},{reviews:0})
+        let search_term = req.query.search_term || ""
+        let price_from = parseFloat(req.query.price_from) || 0
+        let price_to = parseFloat(req.query.price_to) || 999999999
+        let page = parseInt(req.query.page) || 1
+        let per_page = parseInt(req.query.per_page) || 2
+
+
+
+        // let products = await Product.find({
+        //     $or: [
+        //         { name: RegExp(search_term, "i") },
+        //         { categories: RegExp(search_term, "i") },
+        //     ],
+        //     $and: [
+        //         { price: { $gte: price_from } },
+        //         { price: { $lte: price_to } }
+        //     ]
+        // }, {reviews:0})
+
+        /*  
+        aggregation
+        aggrgation pipeline
+        aggrgation framework
+
+        aggregation => advance find method
+        */
+
+        let products = await Product.aggregate(
+            [
+                {
+                    $match: {
+                        $or: [
+                            { name: RegExp(search_term, "i") },
+                            { categories: RegExp(search_term, "i") }
+                        ]
+                    }
+                },
+                {
+                    $match: {
+                        $and: [
+                            { price: { $gte: price_from } },
+                            { price: { $lte: price_to } }
+                        ]
+                    }
+                },
+                {
+                    $addFields: { avg_rating: { $avg: "$reviews.rating" } }
+                },
+
+                {
+                    $lookup: {
+                        from: "users",
+                        localField: "created_by",
+                        foreignField: "_id",
+                        as: "created_by"
+                    }
+                },
+                {
+                    $unwind: "$created_by"
+                },
+                {
+                    $project: {
+                        reviews: 0,
+                        "created_by.password": 0,
+                        "created_by.updatedAt": 0,
+                        "created_by.role": 0,
+                    }
+                },
+                {
+                    $skip: ((page - 1) * per_page)
+                },
+                {
+                    $limit: per_page
+                }
+            ]
+        )
+
         res.send(products)
     } catch (err) {
         next(err)
@@ -68,7 +144,7 @@ const create = async (req, res, next) => {
 const fetchSingleProduct = async (req, res, next) => {
 
     try {
-        let product = await Product.findById(req.params.id)
+        let product = await Product.findById(req.params.id).populate("created_by", "name email")
         console.log(product)
         if (product) {
             res.send(product)

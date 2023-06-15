@@ -31,8 +31,8 @@ let errors = {
 
 // console.log(Object.entries(errors));  // [  []   , [] ]
 
-let converted = Object.entries(errors).map(error =>{
-    return { 
+let converted = Object.entries(errors).map(error => {
+    return {
         params: error[0],
         msg: error[1].message
     }
@@ -44,6 +44,11 @@ console.log(converted)
 
 /*  */
 
-db.products.updateMany({},{
-    $set:{stock:10}
+db.products.updateMany({}, {
+    $set: { stock: 10 }
 })
+
+
+db.products.find({
+
+}, { price: 1,name:1 })

@@ -4,9 +4,8 @@ const { fetchOrders, fetchSingleOrder, createOrder, } = require("../controller/o
 const { checkAuthentication, isBuyer } = require("../middleware/auth")
 const router = express.Router()
 
-router.get("", checkAuthentication, fetchOrders)
-router.get("/order-id", fetchSingleOrder)
-router.post("", checkAuthentication, isBuyer, createOrder)
+router.get("", checkAuthentication, isBuyer, fetchOrders)
+router.get("/order-id",checkAuthentication, isBuyer, fetchSingleOrder)
 router.post("", checkAuthentication, isBuyer, createOrder)
 
 module.exports = router;

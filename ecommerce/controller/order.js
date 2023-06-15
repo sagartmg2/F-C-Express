@@ -1,17 +1,21 @@
 const Order = require("../model/Order")
 const Product = require("../model/Product")
 
-const fetchOrders = (req, res) => {
+const fetchOrders = async (req, res) => {
     /*  link Order model & fetch from Order Model */
-    res.send("list  all orders")
+    let orders = await Order.find({
+        created_by: req.user._id
+    })
+    res.send(orders)
 }
 
-const fetchSingleOrder = (req, res) => {
-    res.send("fetch single orders")
+const fetchSingleOrder = async (req, res) => {
+    let order = await Order.findById(req.params.id)
+    res.send(order)
 }
+
 const createOrder = async (req, res, next) => {
     try {
-
 
         /* 
 
@@ -59,7 +63,7 @@ const createOrder = async (req, res, next) => {
             let dbProduct = await Product.findById(product.product_id)
             mapped_products.push(
                 {
-                    product_id:dbProduct._id,
+                    product_id: dbProduct._id,
                     name: dbProduct.name,
                     price: dbProduct.price,
                     quantity: product.quantity

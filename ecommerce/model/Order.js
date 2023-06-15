@@ -56,8 +56,6 @@ const OrderSchema = new Schema({
 });
 
 OrderSchema.post("save", async function (order) {
-    console.log("saved order")
-    console.log(order)
     for (product of order.products) {
         await Product.findByIdAndUpdate(product.product_id, {
             $inc: { stock: -(product.quantity) }
