@@ -17,16 +17,16 @@ app.use(fileUpload()); //  when data sent in form-data -> sets up req.files
 
 app.use((req, res, next) => {
 
-    function  changeRequest(field){
+    function changeRequest(field) {
 
         let temp = {};
-    
-        if(req[field]){
+
+        if (req[field]) {
             let temp_arr = Object.entries(req[field])
-        
+
             temp_arr.forEach(el => {
                 if (el[0].endsWith("[]")) {
-                    temp[el[0].slice(0, -2)] = Array.isArray(el[1]) ? el[1] : [ el[1] ]
+                    temp[el[0].slice(0, -2)] = Array.isArray(el[1]) ? el[1] : [el[1]]
                 } else {
                     temp[el[0]] = el[1]
                 }
@@ -43,18 +43,16 @@ app.use((req, res, next) => {
 
 })
 
-
 app.use(express.static('uploads'))
 
 app.use("/api/products", product_routes)
 app.use("/api", auth_routes)
 app.use("/api/orders", order_routes)
-
 app.use("/api/todos", todo_routes)
 
 
-app.use(handleResourceNotFoun)
-app.use(handleServerError)
+app.use(handleResourceNotFoun) // 404 
+app.use(handleServerError) // 500 or other dynamic errors mongoose. joi ..
 
 app.listen(8000, () => {
     console.log("Server Started.");

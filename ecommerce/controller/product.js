@@ -26,12 +26,126 @@ const get = async (req, res, next) => {
 
         /*  
         aggregation
+        aggregation stages
         aggrgation pipeline
         aggrgation framework
 
         aggregation => advance find method
         */
 
+        // let products = await Product.aggregate(
+        //     [
+        //         {
+        //             $match: {
+        //                 $or: [
+        //                     { name: RegExp(search_term, "i") },
+        //                     { categories: RegExp(search_term, "i") }
+        //                 ]
+        //             }
+        //         },
+        //         {
+        //             $match: {
+        //                 $and: [
+        //                     { price: { $gte: price_from } },
+        //                     { price: { $lte: price_to } }
+        //                 ]
+        //             }
+        //         },
+        //         {
+        //             $addFields: { avg_rating: { $avg: "$reviews.rating" } }
+        //         },
+        //         {
+        //             $lookup: {
+        //                 from: "users",
+        //                 localField: "created_by",
+        //                 foreignField: "_id",
+        //                 as: "created_by"
+        //             }
+        //         },
+        //         {
+        //             $unwind: "$created_by"
+        //         },
+        //         {
+        //             $project: {
+        //                 reviews: 0,
+        //                 "created_by.password": 0,
+        //                 "created_by.updatedAt": 0,
+        //                 "created_by.role": 0,
+        //             }
+        //         },
+        //         {
+        //             $facet: {
+        //                 meta_data: [
+        //                     { $count: "total" },
+        //                     {
+        //                         $addFields: { page, per_page }
+        //                     }
+
+        //                 ],
+        //                 data: [
+        //                     {
+        //                         $skip: ((page - 1) * per_page)
+        //                     },
+        //                     {
+        //                         $limit: per_page
+        //                     },
+        //                 ]
+        //             }
+        //         },
+        //         {
+        //             $unwind: "$meta_data"
+        //         }
+
+        //     ]
+        // )
+        let total = await Product.aggregate(
+            [
+                {
+                    $match: {
+                        $or: [
+                            { name: RegExp(search_term, "i") },
+                            { categories: RegExp(search_term, "i") }
+                        ]
+                    }
+                },
+                {
+                    $match: {
+                        $and: [
+                            { price: { $gte: price_from } },
+                            { price: { $lte: price_to } }
+                        ]
+                    }
+                },
+                {
+                    $addFields: { avg_rating: { $avg: "$reviews.rating" } }
+                },
+                {
+                    $lookup: {
+                        from: "users",
+                        localField: "created_by",
+                        foreignField: "_id",
+                        as: "created_by"
+                    }
+                },
+                {
+                    $unwind: "$created_by"
+                },
+                {
+                    $project: {
+                        reviews: 0,
+                        "created_by.password": 0,
+                        "created_by.updatedAt": 0,
+                        "created_by.role": 0,
+                    }
+                },
+                {
+                    $count: "total"
+                }
+
+
+
+            ]
+        )
         let products = await Product.aggregate(
             [
                 {
@@ -53,7 +167,6 @@ const get = async (req, res, next) => {
                 {
                     $addFields: { avg_rating: { $avg: "$reviews.rating" } }
                 },
-
                 {
                     $lookup: {
                         from: "users",
@@ -78,11 +191,18 @@ const get = async (req, res, next) => {
                 },
                 {
                     $limit: per_page
-                }
+                },
             ]
         )
 
-        res.send(products)
+        res.send({
+            meta_data: {
+                total: total[0].total,
+                page,
+                per_page
+            },
+            products: products
+        })
     } catch (err) {
         next(err)
     }
